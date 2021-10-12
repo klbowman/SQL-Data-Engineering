@@ -1,0 +1,241 @@
+--DATA ENGINEERING
+
+--Create departments data table and import data
+
+CREATE TABLE departments(
+	departments varchar(20) NOT NULL,
+	dept_name varchar(50) NOT NULL
+);
+
+--Add primary key to departments data table
+ALTER TABLE departments
+ADD COLUMN dept_id SERIAL PRIMARY KEY;
+
+--Check to see that data import was successful
+
+SELECT * FROM departments;
+
+--Create dept_emp data table
+
+CREATE TABLE dept_emp_1(
+	emp_no INT NOT NULL,
+	dept_no varchar(20) NOT NULL)
+;
+
+--Import csv and view dept_emp_1 table
+
+SELECT * FROM dept_emp_1;
+
+--Join departments and dept_emp tables to create foreign key column, save joined data in new table 
+CREATE TABLE dept_emp AS 
+SELECT * FROM dept_emp_1
+INNER JOIN departments ON 
+dept_emp_1.dept_no = departments.departments;
+
+SELECT * FROM dept_emp;
+
+--Drop unwanted columns
+
+ALTER TABLE dept_emp
+DROP COLUMN departments;
+
+ALTER TABLE dept_emp
+DROP COLUMN dept_name;
+
+--Add primary and foreign keys
+
+ALTER TABLE dept_emp
+ADD COLUMN emp_id SERIAL PRIMARY KEY;
+
+ALTER TABLE dept_emp
+ADD CONSTRAINT FK_dept_id
+FOREIGN KEY (dept_id) REFERENCES departments(dept_id);
+
+--Create dept_manager table with a composite key
+
+CREATE TABLE dept_manager_1 (
+	dept_no varchar(20) NOT NULL,
+	emp_no INT NOT NULL,
+	PRIMARY KEY (dept_no,emp_no)
+);
+
+--Import data and view table
+
+SELECT * FROM dept_manager_1;
+
+--Create new table with only emp_no for join
+
+SELECT emp_no
+INTO manager
+FROM dept_manager_1;
+
+SELECT * FROM manager;
+
+ALTER TABLE manager 
+RENAME COLUMN "emp_no" TO "emp_no_m";
+
+
+--Join dept_emp and manager tables to create foreign key column, save joined data in new table 
+CREATE TABLE manager_2 AS 
+SELECT * FROM manager
+INNER JOIN dept_emp ON 
+manager.emp_no_m = dept_emp.emp_no;
+
+SELECT * FROM manager_2;
+
+--Drop unwanted columns
+
+ALTER TABLE manager_2
+DROP COLUMN emp_no;
+
+ALTER TABLE manager_2
+DROP COLUMN dept_no;
+
+--Add foreign keys to dept_manager table 
+CREATE TABLE dept_manager AS 
+SELECT * FROM dept_manager_1
+INNER JOIN manager_2 ON 
+manager_2.emp_no_m = dept_manager_1.emp_no;
+
+--Drop unwanted columns
+
+ALTER TABLE dept_manager
+DROP COLUMN emp_no_m;
+
+--Assign foreign keys
+
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_dept_id
+FOREIGN KEY (dept_id) REFERENCES departments(dept_id);
+
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_emp_id
+FOREIGN KEY (emp_id) REFERENCES dept_emp(emp_id);
+
+--Add primary key
+ALTER TABLE dept_manager
+ADD manager_id SERIAL PRIMARY KEY;
+
+SELECT * FROM dept_manager;
+
+--Create employee table
+CREATE TABLE employee_1(
+	emp_no INT NOT NULL,
+	emp_title varchar(20) NOT NULL,
+	birth_date varchar(20) NOT NULL,
+	first_name varchar(50) NOT NULL,
+	last_name varchar(50) NOT NULL,
+	sex varchar(5) NOT NULL,
+	hire_date varchar(20) NOT NULL
+);
+
+--Import data and view table
+SELECT * FROM employee_1;
+
+--Join dept_emp and employee tables to create foreign key column, save joined data in new table 
+
+ALTER TABLE employee_1 
+RENAME COLUMN "emp_no" TO "emp_no_e";
+
+CREATE TABLE employee AS 
+SELECT * FROM employee_1
+RIGHT JOIN dept_emp ON 
+employee_1.emp_no_e = dept_emp.emp_no;
+
+--add foreign key for titles
+
+CREATE TABLE employees AS 
+SELECT * FROM employee
+RIGHT JOIN titles ON 
+employee.emp_title = titles.title_id;
+
+SELECT * FROM employees; 
+
+--Drop unwanted columns
+
+ALTER TABLE employees
+DROP COLUMN emp_no_e;
+
+ALTER TABLE employees
+DROP COLUMN dept_no;
+
+ALTER TABLE employees
+DROP COLUMN employees_id;
+
+ALTER TABLE employees
+DROP COLUMN title;
+
+ALTER TABLE employees
+DROP COLUMN title_id;
+
+ALTER TABLE employees
+DROP COLUMN employees_id;
+
+
+--Assign foreign keys
+
+ALTER TABLE employees
+ADD CONSTRAINT FK_dept_id
+FOREIGN KEY (dept_id) REFERENCES departments(dept_id);
+
+ALTER TABLE employees
+ADD CONSTRAINT FK_emp_id
+FOREIGN KEY (emp_id) REFERENCES dept_emp(emp_id);
+
+ALTER TABLE employees 
+RENAME COLUMN "id" TO "title_id";
+
+ALTER TABLE employees
+ADD CONSTRAINT FK_title_id
+FOREIGN KEY (title_id) REFERENCES titles(id);
+
+
+--Add primary key to employees data table
+ALTER TABLE employees
+ADD COLUMN employees_id SERIAL PRIMARY KEY;
+
+--Create salaries table
+CREATE TABLE salaries_1(
+	emp_no INT NOT NULL,
+	salary INT NOT NULL
+);
+
+--Import data and view table 
+SELECT * FROM salaries_1;
+
+--Join dept_emp and salaries tables to create foreign key column, save joined data in new table 
+
+ALTER TABLE salaries_1 
+RENAME COLUMN "emp_no" TO "emp_no_e";
+
+CREATE TABLE salaries AS 
+SELECT * FROM salaries_1
+INNER JOIN dept_emp ON 
+salaries_1.emp_no_e = dept_emp.emp_no;
+
+SELECT * FROM salaries; 
+
+--Drop unwanted columns
+
+ALTER TABLE salaries
+DROP COLUMN emp_no_e;
+
+ALTER TABLE salaries
+DROP COLUMN salary_id;
+
+--Add primary key to salaries table
+ALTER TABLE salaries
+ADD COLUMN salary_id SERIAL PRIMARY KEY;
+
+--Create titles table
+CREATE TABLE titles(
+	title_id varchar(20) NOT NULL,
+	title varchar(50) NOT NULL
+);
+
+--Import data and view table
+SELECT * FROM titles; 
+
+--Add primary key to titles table
+ALTER TABLE titles
+ADD COLUMN id SERIAL PRIMARY KEY;
