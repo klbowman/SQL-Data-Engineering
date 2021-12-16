@@ -31,6 +31,9 @@ Once the data is loaded in a SQL database, the DataAnalysis.sql file is queried 
 * Open and query employee.sql (from the EmployeeSQL directory).
 * Open and query DataAnalysis.sql (from the EmployeeSQL directory).
 
+## Data Sources
+* Mockaroo, LLC. (2021). Realistic Data Generator. https://www.mockaroo.com/
+
 ## Author
 
 Katlin Bowman, PhD
